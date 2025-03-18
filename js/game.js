@@ -1,11 +1,11 @@
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
- canvas.width = innerWidth;
- canvas.height = innerHeight;
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 
 window.onresize = function () {
     canvas.width = innerWidth;
- canvas.height = innerHeight;
+    canvas.height = innerHeight;
 }
 
 class Boundary {
@@ -23,21 +23,21 @@ class Boundary {
 
 }
 
-class Player{
-    constructor({position, velocity}){
+class Player {
+    constructor({ position, velocity }) {
 
         this.position = position;
         this.velocity = velocity;
-        this.radius = 15;  
+        this.radius = 15;
     }
-    draw(){
+    draw() {
         c.beginPath();
-        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI*2);
+        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
         c.fillStyle = 'yellow';
         c.fill();
         c.closePath();
     }
-    update(){
+    update() {
         this.draw();
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
@@ -48,39 +48,41 @@ class Player{
 const boundaries = [];
 const player = new Player({
     position: {
-        x:Boundary.width+ Boundary.width/2,
-        y:Boundary.height+Boundary.height/2
+        x: Boundary.width + Boundary.width / 2,
+        y: Boundary.height + Boundary.height / 2
     },
-    velocity:{
-        x:0,
-        y:0
+    velocity: {
+        x: 0,
+        y: 0
     }
 })
 const keys = {
-    w:{
+    w: {
         pressed: false
     },
-    a:{
+    a: {
         pressed: false
     },
-    s:{
+    s: {
         pressed: false
     },
-    d:{
+    d: {
         pressed: false
     }
-    
-    
+
+
 }
 
 let lastKey = ''
 
 const map = [
-    ['-', '-', '-', '-', '-', '-'],
-    ['-', ' ', ' ', ' ', ' ', '-'],
-    ['-', ' ', '-', '-', ' ', '-'],
-    ['-', ' ', ' ', ' ', ' ', '-'],
-    ['-', '-', '-', '-', '-', '-']
+    ['-', '-', '-', '-', '-', '-','-'],
+    ['-', ' ', ' ', ' ', ' ',' ', '-'],
+    ['-', ' ', '-', ' ', '-',' ', '-'],
+    ['-', ' ', ' ', ' ', ' ',' ', '-'],
+    ['-', ' ', '-', ' ', '-',' ', '-'],
+    ['-', ' ', ' ', ' ', ' ',' ', '-'],
+    ['-', '-', '-', '-', '-','-', '-']
 ];
 
 
@@ -99,64 +101,152 @@ map.forEach((row, i) => {
         }
     })
 })
-function animate(){
+
+function circleCollides({
+    circle,
+    rectangle,
+}){
+    return (circle.position.y - circle.radius +circle.velocity.y<= rectangle.position.y + rectangle.height
+        && circle.position.x + circle.radius +circle.velocity.x>= rectangle.position.x 
+        && circle.position.y + circle.radius +circle.velocity.y>= rectangle.position.y
+        && circle.position.x - circle.radius +circle.velocity.x<= rectangle.position.x + rectangle.width);
+}
+
+
+function animate() {
     requestAnimationFrame(animate)
-    c.clearRect(0,0, canvas.width, canvas.height)
+    c.clearRect(0, 0, canvas.width, canvas.height)
+
+    if (keys.w.pressed && lastKey === 'w') {
+        for(let i =0; i < boundaries.length; i++){
+            const boundary = boundaries[i];
+        
+
+        if (circleCollides({
+            circle: {...player, velocity:{
+                x:0,
+                y:-5
+            }},
+            rectangle: boundary
+        })){
+            player.velocity.y = 0;
+            break
+        }else{
+            player.velocity.y = -5;
+        }
+    }
+    } else if (keys.a.pressed && lastKey === 'a') {
+        for(let i =0; i < boundaries.length; i++){
+            const boundary = boundaries[i];
+        
+
+        if (circleCollides({
+            circle: {...player, velocity:{
+                x:-5,
+                y:0
+            }},
+            rectangle: boundary
+        })){
+            player.velocity.x = 0;
+            break
+        }else{
+            player.velocity.x = -5;
+        }
+    }
+    } else if (keys.s.pressed && lastKey === 's') {
+        for(let i =0; i < boundaries.length; i++){
+            const boundary = boundaries[i];
+        
+
+        if (circleCollides({
+            circle: {...player, velocity:{
+                x:0,
+                y:5
+            }},
+            rectangle: boundary
+        })){
+            player.velocity.y = 0;
+            break
+        }else{
+            player.velocity.y = 5;
+        }
+    }
+    } else if (keys.d.pressed && lastKey === 'd') {
+        for(let i =0; i < boundaries.length; i++){
+            const boundary = boundaries[i];
+        
+
+        if (circleCollides({
+            circle: {...player, velocity:{
+                x:5,
+                y:0
+            }},
+            rectangle: boundary
+        })){
+            player.velocity.x = 0;
+            break
+        }else{
+            player.velocity.x = 5;
+        }
+    }
+    }
+
+
     boundaries.forEach((boundary) => {
         boundary.draw();
-        
-    })
-    
-    player.update();
-    player.velocity.x=0;
-    player.velocity.y=0;
 
-    if(keys.w.pressed && lastKey === 'w'){
-        player.velocity.y = -5;
-    }else if(keys.a.pressed&& lastKey === 'a'){
-        player.velocity.x=-5
-    }else if(keys.s.pressed&& lastKey === 's'){
-        player.velocity.y=5
-    }else if(keys.d.pressed&& lastKey === 'd'){
-        player.velocity.x=5
-    }
+        if (circleCollides({
+            circle: player,
+            rectangle: boundary
+        })) {
+            
+            player.velocity.x = 0;
+            player.velocity.y = 0;
+        }
+
+    })
+
+    player.update();
+    
+
+  
 }
 animate();
 
 
-addEventListener('keydown',({key})=>{
-    switch(key){
+addEventListener('keydown', ({ key }) => {
+    switch (key) {
         case 'w':
             keys.w.pressed = true;
             lastKey = 'w'
-        break
+            break
         case 'a':
             keys.a.pressed = true;
             lastKey = 'a'
-        break
+            break
         case 's':
             keys.s.pressed = true;
             lastKey = 's'
-        break
+            break
         case 'd':
             keys.d.pressed = true;
             lastKey = 'd'
-        break
+            break
     }
 })
-addEventListener('keyup',({key})=>{
-    switch(key){
+addEventListener('keyup', ({ key }) => {
+    switch (key) {
         case 'w':
-            keys.w.pressed = false;        
-        break
+            keys.w.pressed = false;
+            break
         case 'a':
-            keys.a.pressed = false;  
-        break
+            keys.a.pressed = false;
+            break
         case 's':
-            keys.s.pressed = false;  
-        break
+            keys.s.pressed = false;
+            break
         case 'd':
-            keys.d.pressed = false;  
-        break
+            keys.d.pressed = false;
+            break
     }
 })
