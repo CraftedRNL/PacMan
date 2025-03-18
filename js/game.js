@@ -1,3 +1,4 @@
+// Le code de el Ryan
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 canvas.width = innerWidth;
@@ -106,7 +107,7 @@ function circleCollides({
     circle,
     rectangle,
 }){
-    return (circle.position.y - circle.radius +circle.velocity.y<= rectangle.position.y + rectangle.height
+    return (circle.position.y - circle.radius +circle.velocity.y<= rectangle.position.y + rectangle.height // Le code de el Ryan
         && circle.position.x + circle.radius +circle.velocity.x>= rectangle.position.x 
         && circle.position.y + circle.radius +circle.velocity.y>= rectangle.position.y
         && circle.position.x - circle.radius +circle.velocity.x<= rectangle.position.x + rectangle.width);
@@ -250,3 +251,4 @@ addEventListener('keyup', ({ key }) => {
             break
     }
 })
+// Le code de el Ryan
